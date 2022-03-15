@@ -1,23 +1,23 @@
 import { ConnectionOptions } from "typeorm";
 
 const config: ConnectionOptions = {
-   type: "mariadb",
+   type: "postgres",
    name: "toodle1",
    host: process.env.DB_HOST,
-   port: 3306,
+   port: Number(process.env.POSTGRES_PORT),
    username: process.env.DB_USER,
    password: process.env.DB_PASSWORD,
    database: process.env.DB_NAME,
    synchronize: true,
    logging: true,
    entities: [
-      "src/entity/**/*.ts"
+      __dirname + '/../**/*.entity.{js,ts}'
    ],
    migrations: [
-      "src/migration/**/*.ts"
+      __dirname + "src/migration/**/*.ts"
    ],
    subscribers: [
-      "src/subscriber/**/*.ts"
+      __dirname + "src/subscriber/**/*.ts"
    ],
    cli: {
       "entitiesDir": "src/entity",

@@ -27,7 +27,11 @@
       "express": "^4.17.2",
       "mariadb": "^2.5.5",
       "mysql": "^2.14.1",
+      "pg": "^8.7.1",
+      "postgres": "^1.0.2",
       "reflect-metadata": "^0.1.10",
+      "ts-node": "^10.7.0",
+      "ts-node-dev": "^1.1.8",
       "typeorm": "0.2.41"
    },
    "devDependencies": {
@@ -36,7 +40,6 @@
       "@typescript-eslint/eslint-plugin": "^5.9.0",
       "@typescript-eslint/parser": "^5.9.0",
       "eslint": "^8.5.0",
-      "ts-node": "3.3.0",
       "typescript": "3.3.3333"
    }
 }
