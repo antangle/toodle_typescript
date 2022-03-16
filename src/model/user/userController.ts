@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction} from 'express';
-import {UserService} from '../service/userService';
-import {User} from '../entity/user.entity';
-import { Result } from '../customType/express';
-import { Consts_typeorm as ConstsTypeorm } from '../const/typeormConst';
+import {UserService} from './userService';
+import {User} from '../../entity/user.entity';
+import { Result } from '../../customType/express';
+import { Consts_typeorm as ConstsTypeorm } from '../../const/typeormConst';
 
 //simple CRUD
 

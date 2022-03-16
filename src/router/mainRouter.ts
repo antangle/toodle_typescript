@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction, query } from 'express';
-import testHello from '../controller/testHello';
-import userRouter from './userRouter';
+import testHello from '../model/test/testHello';
+import userRouter from '../model/user/userRouter';
 const mainRouter = express.Router();
 
 mainRouter.get('/', testHello);

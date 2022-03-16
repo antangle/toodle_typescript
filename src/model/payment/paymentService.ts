@@ -1,7 +1,8 @@
-import { ProductRepository } from './../repository/productRepository';
+import { ProductRepository } from './productRepository';
 import express, { Request, Response, NextFunction} from 'express';
 import { Connection, getConnection, getCustomRepository, Repository } from "typeorm";
-import { Product } from '../entity/product.entity';
+import { Product } from '../../entity/product.entity';
+
 export class PaymentService{
     //repository
     productRepository: ProductRepository    

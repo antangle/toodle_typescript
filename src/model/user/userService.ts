@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction} from 'express';
 import { Connection, getConnection, getCustomRepository, Repository } from "typeorm";
-import { User } from '../entity/user.entity';
-import {UserRepository} from '../repository/userRepository';
+import { User } from '../../entity/user.entity';
+import {UserRepository} from './userRepository';
 
 export class UserService{
     //repository

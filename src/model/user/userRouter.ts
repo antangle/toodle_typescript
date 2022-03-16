@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction, query } from 'express';
-import {getUser, insertUser, updateUserNickname, deleteUser} from '../controller/userController';
+import {getUser, insertUser, updateUserNickname, deleteUser} from './userController';
 
 const userRouter = express.Router();
 
