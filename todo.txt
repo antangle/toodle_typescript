@@ -1,13 +1,9 @@
 typeORM? sequalize? 정하고 연동하기 - typeORM선정!
-~1/7
 
 github 연동
 CRUD 다 해보고(insert, select 완성) join 해보고
-1/9
-
 
 커스텀에러
-1/10 ~ 1/11
 
 로깅
 1/12 ~ 1/13

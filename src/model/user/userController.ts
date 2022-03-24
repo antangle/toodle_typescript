@@ -1,137 +1,87 @@
-import express, { Request, Response, NextFunction} from 'express';
-import {UserService} from './userService';
-import {User} from '../../entity/user.entity';
-import { Result } from '../../customType/express';
-import { Consts_typeorm as ConstsTypeorm } from '../../const/typeormConst';
-
+import { errCatcher } from './../../middleware/errorHandler';
+import { validateUser } from './../../middleware/inputParser';
+import { TYPEORM_CONNECTION_NAME } from './../../const/constants';
+import { UserDTO } from './../../dto/userDTO';
+import { IController } from './../../interface/interfaces';
+import { Request, Response, NextFunction, Router } from 'express';
+import { UserService } from './userService';
+import { User } from '../../entity/user.entity';
+import { CustomError } from '../../error/customError';
+import { makeApiResponse } from '../../middleware/responseHandler';
 //simple CRUD
 
-export const getUser = async (req: Request, res: Response, next: NextFunction) => {
-    const userService = new UserService(ConstsTypeorm.TYPEORM_CONNECTION_NAME);
-    try{
-        const user: User[] | undefined = await userService.getAllUser();
-        if(!user) throw Error;
-        
-        req.result = {
-            status: 1,
-            data: user
-        };  
+export class UserController{
+    private service: UserService;
+    public url: string;
+    public router: Router
+    constructor(url: string, service: UserService){
+        this.url = url;
+        this.router = Router();
+        this.service = service;
+        this.routes();
     }
-    catch(err){
-        console.log(err);
 
-        if(err instanceof Error){
-            req.result = {
-                status: -1,
-                message: err.message,
-            };
-        }
+    public routes(){
+        this.router.get('/',                errCatcher(this.getUser.bind(this)));
+        this.router.post('/', validateUser, errCatcher(this.insertUser.bind(this)));
+        this.router.patch('/', validateUser, errCatcher(this.updateUserNickname.bind(this)));
+        this.router.delete('/', validateUser, errCatcher(this.deleteUser.bind(this)));
+        this.router.post('/login', errCatcher(this.localLogin.bind(this)));
     }
-    finally{
+
+    public async getUser(req: Request, res: Response, next: NextFunction){
+        const user: User[] | undefined = await this.service.getAllUser();
+        if(!user) throw new CustomError(-1011, 'user does not exist');
+
+        req.result = makeApiResponse(101, user);
         res.send(req.result);
     }
-}
 
-export const insertUser = async (req: Request, res: Response, next: NextFunction) => {
-    const userService = new UserService(ConstsTypeorm.TYPEORM_CONNECTION_NAME);
-    try{
-        //parse req input into User - todo: make validation middleware
-        const newUser = new User();
-        newUser.username = req.body.username;
-        newUser.email = req.body.email;
-        newUser.nickname = req.body.nickname;
-        newUser.password = req.body.password;
-        newUser.terms_and_agreement = req.body.terms;
-        
-        const user: User | undefined = await userService.insertUser(newUser);
-        if(!user) throw Error;
-        
-        req.result = {
-            status: 1,
-            data: [user]
-        };
-    }
-    catch(err){
-        console.log(err);
     
-        if(err instanceof Error){
-            req.result = {
-                status: -2,
-                message: err.message,
-            };
-        }
-    }
-    finally{
+    public async insertUser(req: Request, res: Response, next: NextFunction){
+        //parsing middleware put newUser in req object
+        const newUser: UserDTO = req.newUser;
+        if(!newUser) throw new CustomError(1021, 'user input is wrong');
+        
+        //insert
+        const user: User | undefined = await this.service.insertUser(newUser);
+        if(!user) throw new CustomError(-1021, 'user does not exist');
+        
+        //send response
+        req.result = makeApiResponse(102, user);
         res.send(req.result);
     }
-}
-
-export const updateUserNickname = async (req: Request, res: Response, next: NextFunction) => {
-    const userService = new UserService(ConstsTypeorm.TYPEORM_CONNECTION_NAME);
-    try{
-        //parse req input into User - todo: make validation middleware
-        const newUser = new User();
-        newUser.username = req.body.username;
-        newUser.nickname = req.body.nickname;
-        var password = req.body.password;
+    
+    public async updateUserNickname(req: Request, res: Response, next: NextFunction){
+        //parsing middleware put newUser in req object
+        const newUser: UserDTO = req.newUser;
+        if(!newUser) throw new CustomError(1031, 'user input is wrong');
         
-        //verification
-
-
         //update
-        const user: User | undefined = await userService.updateUser(newUser);
-        if(!user) throw Error;
+        const user: User | undefined = await this.service.updateUser(newUser);
+        if(!user) throw new CustomError(-1031, 'user does not exist');
         
-        req.result = {
-            status: 1,
-            data: [user]
-        };
-    }
-    catch(err){
-        console.log(err);
-    
-        if(err instanceof Error){
-            req.result = {
-                status: -3,
-                message: err.message,
-            };
-        }
-    }
-    finally{
+        //send response
+        req.result = makeApiResponse(103, user);
         res.send(req.result);
     }
-}
-
-
-export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-    const userService = new UserService(ConstsTypeorm.TYPEORM_CONNECTION_NAME);
-    try{
-        //parse req input into User - todo: make validation middleware
-        const newUser = new User();
-        newUser.username = req.body.username;
-        
-        var password = req.body.password;
-        //verification?
-
-        const user: User | undefined = await userService.deleteUser(newUser);
-        if(!user) throw Error;
-        
-        req.result = {
-            status: 1,
-            data: [user]
-        };
-    }
-    catch(err){
-        console.log(err);
     
-        if(err instanceof Error){
-            req.result = {
-                status: -3,
-                message: err.message,
-            };
-        }
-    }
-    finally{
+    public async deleteUser(req: Request, res: Response, next: NextFunction){
+        //parsing middleware put newUser in req object
+        const newUser: UserDTO = req.newUser;
+        if(!newUser) throw new CustomError(1041, 'user input is wrong');
+        
+        //delete user
+        const user: User | undefined = await this.service.deleteUser(newUser);
+        if(!user) throw new CustomError(-1041, 'user does not exist');
+        
+        //send response
+        req.result = makeApiResponse(104, user);
         res.send(req.result);
+    }
+    
+    public async localLogin(req: Request, res: Response, next: NextFunction){
+        
+        //send response
     }
 }
