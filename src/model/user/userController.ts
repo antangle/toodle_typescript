@@ -1,8 +1,8 @@
+import { InputError } from './../../error/inputError';
+import { hashPassword } from './../../middleware/passwordEncrypter';
 import { errCatcher } from './../../middleware/errorHandler';
-import { validateUser } from './../../middleware/inputParser';
-import { TYPEORM_CONNECTION_NAME } from './../../const/constants';
+import { validateInput } from '../../middleware/validator';
 import { UserDTO } from './../../dto/userDTO';
-import { IController } from './../../interface/interfaces';
 import { Request, Response, NextFunction, Router } from 'express';
 import { UserService } from './userService';
 import { User } from '../../entity/user.entity';
@@ -14,6 +14,7 @@ export class UserController{
     private service: UserService;
     public url: string;
     public router: Router
+
     constructor(url: string, service: UserService){
         this.url = url;
         this.router = Router();
@@ -21,28 +22,31 @@ export class UserController{
         this.routes();
     }
 
-    public routes(){
+    private routes(){
         this.router.get('/',                errCatcher(this.getUser.bind(this)));
-        this.router.post('/', validateUser, errCatcher(this.insertUser.bind(this)));
-        this.router.patch('/', validateUser, errCatcher(this.updateUserNickname.bind(this)));
-        this.router.delete('/', validateUser, errCatcher(this.deleteUser.bind(this)));
-        this.router.post('/login', errCatcher(this.localLogin.bind(this)));
+        this.router.post('/', validateInput, errCatcher(this.insertUser.bind(this)));
+        this.router.patch('/', validateInput, errCatcher(this.updateUserNickname.bind(this)));
+        this.router.delete('/', validateInput, errCatcher(this.deleteUser.bind(this)));
     }
 
-    public async getUser(req: Request, res: Response, next: NextFunction){
+    private async getUser(req: Request, res: Response, next: NextFunction){
         const user: User[] | undefined = await this.service.getAllUser();
         if(!user) throw new CustomError(-1011, 'user does not exist');
 
         req.result = makeApiResponse(101, user);
         res.send(req.result);
     }
-
     
-    public async insertUser(req: Request, res: Response, next: NextFunction){
+    private async insertUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
         if(!newUser) throw new CustomError(1021, 'user input is wrong');
         
+        //hash password with bcrypt
+        if(newUser.password == undefined) throw new InputError(1021, 'user password is undefined');
+        const hashedPassword = await hashPassword(newUser.password);
+        newUser.password = hashedPassword;
+
         //insert
         const user: User | undefined = await this.service.insertUser(newUser);
         if(!user) throw new CustomError(-1021, 'user does not exist');
@@ -52,7 +56,7 @@ export class UserController{
         res.send(req.result);
     }
     
-    public async updateUserNickname(req: Request, res: Response, next: NextFunction){
+    private async updateUserNickname(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
         if(!newUser) throw new CustomError(1031, 'user input is wrong');
@@ -66,7 +70,7 @@ export class UserController{
         res.send(req.result);
     }
     
-    public async deleteUser(req: Request, res: Response, next: NextFunction){
+    private async deleteUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
         if(!newUser) throw new CustomError(1041, 'user input is wrong');
@@ -78,10 +82,5 @@ export class UserController{
         //send response
         req.result = makeApiResponse(104, user);
         res.send(req.result);
-    }
-    
-    public async localLogin(req: Request, res: Response, next: NextFunction){
-        
-        //send response
     }
 }

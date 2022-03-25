@@ -1,8 +1,13 @@
+import { Payment } from './../../entity/payment.entity';
+import { PaymentService } from './../payment/paymentService';
 import express, { Request, Response, NextFunction} from 'express';
-import { Result } from '../../customType/express';
-import { Consts_typeorm as ConstsTypeorm } from '../../const/typeormConst';
+import consts from '../../const/constants'
 
-export const getPaymentInfo = async (req: Request, res: Response, next: NextFunction) => {
-
+export const savePaymentInfo = async (req: Request, res: Response, next: NextFunction) => {
+    const paymentService = new PaymentService(consts.TYPEORM_CONNECTION_NAME);
     
+    //parse paymentInfo
+    const paymentInfo: Payment = req.body.payment
+
+    paymentService.savePayment(paymentInfo)
 }

@@ -15,6 +15,9 @@
       "strict": true, 
       "esModuleInterop": true, 
       "skipLibCheck": true,
-      "typeRoots": ["./node_modules/@types","./src/customType"]
+      "typeRoots": [
+         "./node_modules/@types", 
+         "./src/types/*"
+      ]
    }
 }

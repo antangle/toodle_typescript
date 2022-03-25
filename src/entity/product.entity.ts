@@ -10,9 +10,6 @@ export class Product{
     @Column()
     name?: string;
 
-    @Column({
-        type: 'varchar',
-        length: 2049
-    })
+    @Column()
     cost?: number;
 }

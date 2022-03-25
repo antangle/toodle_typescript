@@ -7,23 +7,29 @@ export class User {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @Column()
+    @Column({
+        unique: true
+    })
     username!: string;
 
-    @Column()
+    @Column({
+        unique: true
+    })
     email?: string;
 
-    @Column()
-    password!: string;
+    @Column({
+        length: 73
+    })
+    password?: string;
 
     @Column()
-    nickname!: string;
+    nickname?: string;
 
     @CreateDateColumn()
-    created_at!: Date;
+    created_at?: Date;
 
     @UpdateDateColumn()
-    updated_at!: Date;
+    updated_at?: Date;
 
     @Column({
         nullable: true
@@ -43,8 +49,12 @@ export class User {
     @Column({
         nullable: true
     })
-    login_method?: number
+    login_method?: number;
 
     @OneToMany(() => Auth, auth => auth.user)
-    auth?: Auth[]
+    auth?: Auth[];
+
+    @Column()
+    role!: string;
+
 }

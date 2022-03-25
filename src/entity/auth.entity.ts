@@ -17,6 +17,6 @@ export class Auth{
     })
     access_token?: string;
 
-    @ManyToOne(() => User, (user: { auth: Auth[]; }) => user.auth)
+    @ManyToOne(() => User, user => user.auth)
     user?: User;
 }

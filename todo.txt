@@ -1,23 +1,15 @@
 typeORM? sequalize? 정하고 연동하기 - typeORM선정!
 
 github 연동
-CRUD 다 해보고(insert, select 완성) join 해보고
+CRUD 다 해보고(insert, select 완성) 
+join 해보고
 
 커스텀에러
 
 로깅
-1/12 ~ 1/13
 
 로그인 기능, OAUTH2 통한 로그인 구현
-1/14 ~ 1/17
 
 결제모듈 장착
-1/18 ~ 1/22
-
-db seed넣고 대량조회 시간 비교?
-1/23 ~ 1/26
 
 기능 추가
-1/27 ~ 1/30
-
-포트폴리오 1/31 ~ 2/02
