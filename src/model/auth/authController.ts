@@ -1,3 +1,5 @@
+import { setpos } from './../../middleware/setPosition';
+import { User } from './../../entity/user.entity';
 import { hashPassword } from './../../middleware/passwordEncrypter';
 import { sign } from './../../middleware/jwt';
 import { InputError } from './../../error/inputError';
@@ -5,13 +7,14 @@ import { makeApiResponse } from './../../middleware/responseHandler';
 import { validateInput } from '../../middleware/validator';
 import { UserDTO } from './../../dto/userDto';
 import { UserService } from './../user/userService';
-import { errCatcher } from './../../middleware/errorHandler';
+import { errCatcher, errCode } from './../../middleware/errorHandler';
 import { Router } from 'express';
 import { CustomError } from '../../error/customError';
 import { IController } from '../../interface/interfaces';
 import { Request, Response, NextFunction} from 'express';
 import { comparePassword } from '../../middleware/passwordEncrypter';
-import cookie from 'cookie';
+import consts from '../../const/consts';
+
 export class AuthController implements IController{
     public url: string;
     public router: Router;
@@ -23,57 +26,65 @@ export class AuthController implements IController{
         this.routes();
     }
     private routes(){
-        this.router.post('/check', validateInput, errCatcher(this.checkUsernameExists.bind(this)));        
-        this.router.post('/login', validateInput, errCatcher(this.login.bind(this)));
-        this.router.post('/signin', validateInput, errCatcher(this.signIn.bind(this)));
+        this.router.post('/check', setpos(201), validateInput, errCatcher(this.checkUsernameExists.bind(this)));
+        this.router.post('/login', setpos(202), validateInput, errCatcher(this.login.bind(this)));
+        this.router.post('/signin', setpos(203), validateInput, errCatcher(this.signIn.bind(this)));
     }
-
+    //for sign in -> check id function
+    
+    //201
     private async checkUsernameExists(req: Request, res: Response, next: NextFunction){
         const newUser: UserDTO = req.newUser;
-        if(!newUser) throw new CustomError(2011, 'user input is wrong');
+        if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         const isUsernameExists: boolean = await this.service.getUsername(newUser);
         
-        req.result = makeApiResponse(201, isUsernameExists);
+        req.result = makeApiResponse(req.pos!, isUsernameExists);
         res.send(req.result);
     }
-    
+    //202    
     //local login. only with username, password, when succeed => sign new access token
     private async login(req:Request, res:Response, next:NextFunction){
         const user: UserDTO = req.newUser;
-        if(!user) throw new InputError(2021, 'user input is wrong');
+        if(!user) throw new InputError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //get hashed password from db
-        const hashedPassword: string | undefined = await this.service.getPasswordByUsername(user);
-        if(!hashedPassword) throw new CustomError(-2021, 'no such user exists');
+        const result: User | undefined = await this.service.getPasswordByUsername(user);
+        if(!result) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        const hashPassword = result.password;
         
         //compare password with bcrypt
-        const isPasswordMatch = await comparePassword(user.password!, hashedPassword);
-        if(!isPasswordMatch) throw new CustomError(2021, 'wrong password or invalid username');
+        const isPasswordMatch = await comparePassword(user.password!, hashPassword!);
+        if(!isPasswordMatch) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
 
         //sign jwt and send
-        const token = sign(user).accessToken;
+        const token = sign(user);
         
-        req.result = makeApiResponse(202);
-        res.cookie('token', token, {path: '/', httpOnly: true});
+        req.result = makeApiResponse(req.pos!);
+        res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
+        res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
         res.send(req.result);
     }
-    
+
+    //203
+    //signing in logic. when successful, insert db then sign tokens
     private async signIn(req:Request, res:Response, next:NextFunction){
         const user: UserDTO = req.newUser;
-        if(!user) throw new InputError(2031, 'user input is wrong');
+        if(!user) throw new InputError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //hash password with bcrypt
         user.password = await hashPassword(user.password!);        
         
         //sign jwt and send
-        const token = sign(user).accessToken;
-        
-        await this.service.insertUser(user);
-        
-        req.result = makeApiResponse(203);
-        res.cookie('token', token, {path: '/', httpOnly: true});
-        //res.setHeader('Set-Cookie', cookie.serialize('token', token, {httpOnly: true}))
+        const token = sign(user);
+
+        user.refreshToken = token.refreshToken;
+        const result = await this.service.insertUser(user);
+        if(!result) throw new CustomError(errCode(req.pos!, consts.INSERT_ERROR_CODE), consts.INSERT_ERROR_STR);
+
+        req.result = makeApiResponse(req.pos!);
+        res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
+        res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
         res.send(req.result);
     }
 }

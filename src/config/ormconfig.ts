@@ -1,9 +1,9 @@
-import { TYPEORM_CONNECTION_NAME } from './../const/constants';
+import consts from '../const/consts';
 import { ConnectionOptions } from "typeorm";
 
 const config: ConnectionOptions = {
    type: "postgres",
-   name: TYPEORM_CONNECTION_NAME,
+   name: consts.TYPEORM_CONNECTION_NAME,
    host: process.env.DB_HOST,
    port: Number(process.env.POSTGRES_PORT),
    username: process.env.DB_USER,

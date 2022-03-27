@@ -1,9 +1,11 @@
+import { verify } from './../../middleware/jwt';
+import { AuthController } from './../auth/authController';
 import { errCatcher } from './../../middleware/errorHandler';
 import { Router } from 'express';
 import { CustomError } from '../../error/customError';
 import { IController } from '../../interface/interfaces';
 import express, { Request, Response, NextFunction} from 'express';
-import { verify } from '../../middleware/jwt';
+import { setpos } from '../../middleware/setPosition';
 
 export class TestController implements IController{
     public url: string;
@@ -14,10 +16,11 @@ export class TestController implements IController{
         this.routes();
     }
     public routes(){
-        this.router.use('/', verify, errCatcher(this.testHello));
+        this.router.use('/', setpos(900), verify, errCatcher(this.testHello));
     }
     public testHello(req:Request, res:Response, next:NextFunction){
         //throw new CustomError(1, "you did it!");
+        console.log(req.pos);
         res.send("hello World!");
     }
 }

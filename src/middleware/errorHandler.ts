@@ -4,6 +4,11 @@ import { CustomError } from '../error/customError';
 
 type MiddlewareInput = {(req: Request, res: Response, next: NextFunction): any};
 
+export const errCode = (pos: number, errCode: number): number => {
+    let code: string = "" + pos + Math.abs(errCode);
+    return Math.sign(errCode) * parseInt(code);
+}
+
 export const errCatcher = (fn: MiddlewareInput) => (req: Request, res: Response, next: NextFunction) => { 
     return Promise.resolve(fn(req, res, next)).catch(next);
 }

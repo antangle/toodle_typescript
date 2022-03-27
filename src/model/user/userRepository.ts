@@ -41,6 +41,7 @@ export class UserRepository extends Repository<User> {
                 email: user.email,
                 terms_and_agreement: user.terms_and_agreement,
                 role: user.role,
+                refreshToken: user.refreshToken,
             })
             .returning("*")
             .execute();

@@ -1,4 +1,5 @@
 import express, { ErrorRequestHandler } from 'express';
+import path from 'path';
 import { ICustomRouter, IController } from './interface/interfaces';
 
 export class Server {
@@ -20,6 +21,9 @@ export class Server {
     private config(middlewares: any[], controllers: IController[], errorHandler: ErrorRequestHandler){
         this.setMiddlewares(middlewares);
         this.setControllers(controllers);
+        //settings
+        this.app.set('views', path.join(__dirname, 'views'));
+        this.app.set('view engine', 'ejs');
 
         //errorHandler should be the last
         this.setGlobalErrorHandler(errorHandler);

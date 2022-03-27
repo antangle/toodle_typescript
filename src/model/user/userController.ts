@@ -1,6 +1,7 @@
+import { setpos } from './../../middleware/setPosition';
 import { InputError } from './../../error/inputError';
 import { hashPassword } from './../../middleware/passwordEncrypter';
-import { errCatcher } from './../../middleware/errorHandler';
+import { errCatcher, errCode } from './../../middleware/errorHandler';
 import { validateInput } from '../../middleware/validator';
 import { UserDTO } from './../../dto/userDTO';
 import { Request, Response, NextFunction, Router } from 'express';
@@ -8,6 +9,8 @@ import { UserService } from './userService';
 import { User } from '../../entity/user.entity';
 import { CustomError } from '../../error/customError';
 import { makeApiResponse } from '../../middleware/responseHandler';
+import { verify } from '../../middleware/jwt';
+import consts from '../../const/consts';
 //simple CRUD
 
 export class UserController{
@@ -23,64 +26,64 @@ export class UserController{
     }
 
     private routes(){
-        this.router.get('/',                errCatcher(this.getUser.bind(this)));
-        this.router.post('/', validateInput, errCatcher(this.insertUser.bind(this)));
-        this.router.patch('/', validateInput, errCatcher(this.updateUserNickname.bind(this)));
-        this.router.delete('/', validateInput, errCatcher(this.deleteUser.bind(this)));
+        this.router.get('/', setpos(101), verify, errCatcher(this.getUser.bind(this)));
+        this.router.post('/', setpos(102), validateInput, errCatcher(this.insertUser.bind(this)));
+        this.router.patch('/', setpos(103), verify, validateInput, errCatcher(this.updateUserNickname.bind(this)));
+        this.router.delete('/', setpos(104), verify, validateInput, errCatcher(this.deleteUser.bind(this)));
     }
-
+    //101
     private async getUser(req: Request, res: Response, next: NextFunction){
         const user: User[] | undefined = await this.service.getAllUser();
-        if(!user) throw new CustomError(-1011, 'user does not exist');
+        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
 
-        req.result = makeApiResponse(101, user);
+        req.result = makeApiResponse(req.pos!, user);
         res.send(req.result);
     }
-    
+    //102    
     private async insertUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
-        if(!newUser) throw new CustomError(1021, 'user input is wrong');
+        if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //hash password with bcrypt
-        if(newUser.password == undefined) throw new InputError(1021, 'user password is undefined');
+        if(newUser.password == undefined) throw new InputError(errCode(req.pos!, consts.UNDEFINED_CODE), consts.UNDEFINED_STR);
         const hashedPassword = await hashPassword(newUser.password);
         newUser.password = hashedPassword;
 
         //insert
-        const user: User | undefined = await this.service.insertUser(newUser);
-        if(!user) throw new CustomError(-1021, 'user does not exist');
+        const user: boolean | undefined = await this.service.insertUser(newUser);
+        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
         
         //send response
-        req.result = makeApiResponse(102, user);
+        req.result = makeApiResponse(req.pos!, user);
         res.send(req.result);
     }
-    
+    //103
     private async updateUserNickname(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
-        if(!newUser) throw new CustomError(1031, 'user input is wrong');
+        if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //update
         const user: User | undefined = await this.service.updateUser(newUser);
-        if(!user) throw new CustomError(-1031, 'user does not exist');
+        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
         
         //send response
-        req.result = makeApiResponse(103, user);
+        req.result = makeApiResponse(req.pos!, user);
         res.send(req.result);
     }
-    
+    //104    
     private async deleteUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
         const newUser: UserDTO = req.newUser;
-        if(!newUser) throw new CustomError(1041, 'user input is wrong');
+        if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //delete user
         const user: User | undefined = await this.service.deleteUser(newUser);
-        if(!user) throw new CustomError(-1041, 'user does not exist');
+        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
         
         //send response
-        req.result = makeApiResponse(104, user);
+        req.result = makeApiResponse(req.pos!, user);
         res.send(req.result);
     }
 }

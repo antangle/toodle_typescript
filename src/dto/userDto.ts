@@ -6,4 +6,5 @@ export class UserDTO {
     email ?: string;
     terms_and_agreement ?: number;
     role ?: string;
+    refreshToken ?: string;
 }

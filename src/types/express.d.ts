@@ -5,6 +5,7 @@ declare namespace Express{
 	interface Request {
 		result ?: Result;
 		newUser ?: User;
+		pos ?: number;
 	}
 }
 

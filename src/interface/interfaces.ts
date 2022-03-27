@@ -1,3 +1,4 @@
+import { JwtPayload } from 'jsonwebtoken';
 import { Router } from "express";
 
 export interface ICustomRouter {
@@ -11,9 +12,15 @@ export interface IController {
     router: Router;
 }
 
-export interface jwtResult {
+export interface JwtResult {
     isvalid: boolean;
-    data?: any;
+    payload?: JwtPayload;
+    refresh?: boolean;
+}
+
+export interface ExpressSettings{
+    key: string;
+    value: string;
 }
 
 export interface Result{

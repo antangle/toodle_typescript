@@ -1,7 +1,7 @@
 import { Product } from './../../entity/product.entity';
 import { Request, Response, NextFunction } from 'express';
 import { ProductService } from './productService';
-import consts from '../../const/constants'
+import consts from '../../const/consts'
 
 export const getProductInfo = async (req: Request, res: Response, next: NextFunction) => {
     const productService = new ProductService(consts.TYPEORM_CONNECTION_NAME);
