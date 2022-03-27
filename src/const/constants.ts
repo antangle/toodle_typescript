@@ -1,1 +1,0 @@
-export const TYPEORM_CONNECTION_NAME = "toodle1";
