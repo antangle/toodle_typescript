@@ -8,9 +8,10 @@
   <script src="./index.js"></script>
 </head>
 <body>
-    <h1>Kakao Oauth test</h1>
+    <h1>local login page</h1>
     <div>
-        <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=<%= client_id %>&redirect_uri=<%= redirect_uri %>&state=<%= state %>" className={style.kakao}>카카오 로그인</a>
+      <a href="http://localhost:3000/auth/login">로그인</a>
+      <a href="http://localhost:3000/auth/signin">회원가입</a>
     </div>
 </body>
 </html>

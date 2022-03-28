@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>index</title>
+  <script src="./index.js"></script>
+</head>
+<body>
+    <h1>Kakao Oauth test</h1>
+    <div>
+        <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=<%= client_id %>&redirect_uri=<%= login_redirect_uri %>&state=<%= state %>" className={style.kakao}>카카오 로그인</a>
+        <a href="https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=<%= client_id %>&redirect_uri=<%= signin_redirect_uri %>&state=<%= state %>" className={style.kakao}>카카오 회원가입</a>
+    </div>
+</body>
+</html>

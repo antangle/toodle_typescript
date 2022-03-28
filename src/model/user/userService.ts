@@ -1,3 +1,4 @@
+import { errCatcher } from './../../middleware/errorHandler';
 import { JwtPayload } from 'jsonwebtoken';
 import { JwtResult } from './../../interface/interfaces';
 import { CustomError } from './../../error/customError';
@@ -15,34 +16,38 @@ export class UserService{
         //get new connection
         this.userRepository = getConnection(connectionName).getCustomRepository(UserRepository);
     }
-    
+    async save(user: User):Promise<any>{
+        return this.userRepository.save(user);
+    } 
     //find all users
     async getAllUser(): Promise<User[] | undefined>{    
         const result: User[] | undefined = await this.userRepository.findAll();
         return result;
     }
     //for checking if username exists   
-    async getUsername(user: UserDTO): Promise<boolean> {
-        const result: User | undefined = await this.userRepository.findPasswordByUsername(user.username);
+    async getEmail(user: UserDTO): Promise<boolean> {
+        const result: User | undefined = await this.userRepository.findOne({email: user.email});
         return !!result;
     }
-    async getRefreshToken(payload: JwtPayload): Promise<User | undefined> {
-        const username = payload.username;
-        const result: User | undefined = await this.userRepository.findOne({username: username});
-        return result;
+    async getRefreshToken(payload: JwtPayload): Promise<string | undefined> {
+        const email = payload.email;
+        const result: User | undefined = await this.userRepository.findOne({email: email});
+        return result!.refreshToken;
     }
-    async getPasswordByUsername(user: UserDTO): Promise<User | undefined>{
-        const result: User | undefined = await this.userRepository.findPasswordByUsername(user.username);
-        return result;
+    async getPasswordByEmail(user: UserDTO): Promise<string | undefined>{
+        const result: User | undefined = await this.userRepository.findOne({email: user.email});
+        if(!result) throw new CustomError(consts.NO_USER_EXISTS_CODE, consts.NO_USER_EXISTS_STR);
+        return result.password;
     }
 
-    async saveRefreshToken(username: string, token: string): Promise<boolean>{
-        const result = await this.userRepository.updateRefreshToken(username, token);
+    async saveRefreshToken(email: string, token: string): Promise<boolean>{
+        const result = await this.userRepository.updateRefreshToken(email, token);
         return result;
     }
+    
     //insert new user
     async insertUser(user: UserDTO): Promise<boolean | undefined>{
-        const result: [User] | undefined = await this.userRepository.saveUser(user);     
+        const result: User | undefined = await this.userRepository.save(user.toUserEntity());     
         return !!result;
     }
     

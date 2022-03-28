@@ -1,6 +1,6 @@
 import { setpos } from './../../middleware/setPosition';
 import { InputError } from './../../error/inputError';
-import { hashPassword } from './../../middleware/passwordEncrypter';
+import { hashPassword } from '../../util/passwordEncrypter';
 import { errCatcher, errCode } from './../../middleware/errorHandler';
 import { validateInput } from '../../middleware/validator';
 import { UserDTO } from './../../dto/userDTO';
@@ -8,9 +8,10 @@ import { Request, Response, NextFunction, Router } from 'express';
 import { UserService } from './userService';
 import { User } from '../../entity/user.entity';
 import { CustomError } from '../../error/customError';
-import { makeApiResponse } from '../../middleware/responseHandler';
+import { makeApiResponse } from '../../util/responseHandler';
 import { verify } from '../../middleware/jwt';
 import consts from '../../const/consts';
+import { Auth } from '../../entity/auth.entity';
 //simple CRUD
 
 export class UserController{

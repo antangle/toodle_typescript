@@ -9,14 +9,20 @@ export class Auth{
     id?: number;
 
     @Column()
-    oauth_provider?: string;
+    provider?: string;
+    
+    @Column()
+    register_id ?: number;
 
     @Column({
         type: 'varchar',
         length: 2049
     })
-    access_token?: string;
+    refresh_token?: string;
 
     @ManyToOne(() => User, user => user.auth)
     user?: User;
+
+    @Column()
+    userId?: number;
 }

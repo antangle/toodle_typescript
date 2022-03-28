@@ -22,14 +22,13 @@ export class UserRepository extends Repository<User> {
         return await this.findOne({username: username});
     }
 
-    async findPasswordByUsername(username: string): Promise<User | undefined>{
+    async findPasswordByEmail(email: string): Promise<User | undefined>{
         const result = await this.createQueryBuilder("user")
             .select("user.password")
-            .where("user.username = :username", {username})
+            .where("user.email = :email", {email})
             .getOne();
         return result;
     }
-
     async saveUser(user: UserDTO): Promise<any>{
         const result = await this.createQueryBuilder()
             .insert()
@@ -48,18 +47,18 @@ export class UserRepository extends Repository<User> {
         return result.raw;
     }
 
-    async updateRefreshToken(username: string, token: string): Promise<boolean>{
+    async updateRefreshToken(email: string, token: string): Promise<boolean>{
         const result = await this.createQueryBuilder()
             .update(User)
             .set({
                 refreshToken: token
             } as any) // wtf??
             .where({
-                username: username
+                email: email
             })
         return !!result;
     }
-
+    
     async updateNicknameByUsername(username: string, nickname: string | undefined): Promise<any> {
         const result = await this.createQueryBuilder()
             .update(User)

@@ -1,4 +1,3 @@
-import { KakaoController } from './model/auth/OauthController';
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -13,7 +12,9 @@ import { UserService } from './model/user/userService';
 import { AuthController } from './model/auth/authController';
 import { TestController } from './model/test/testController';
 import { UserController } from './model/user/userController';
+import { KakaoController } from './model/auth/kakaoController';
 import consts from './const/consts';
+import { AuthService } from './model/auth/authService';
 
 async function main(){
     await createConnection(config);
@@ -27,10 +28,11 @@ async function main(){
 
     //instance container
     const userService = new UserService(consts.TYPEORM_CONNECTION_NAME);
+    const authService = new AuthService(consts.TYPEORM_CONNECTION_NAME);
     const userController = new UserController('/user', userService);
     const authController = new AuthController('/auth', userService);
     const testController = new TestController('/test');
-    const kakaoController = new KakaoController('/oauth/kakao', userService);
+    const kakaoController = new KakaoController('/oauth/kakao', userService, authService);
 
     const controllers: IController[] = [
         userController,

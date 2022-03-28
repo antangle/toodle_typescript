@@ -1,7 +1,12 @@
+import { Method } from "axios";
+
 export = Object.freeze({
     TYPEORM_CONNECTION_NAME: "toodle1",    
     
     //consts
+    GET: "get" as Method,
+    POST: "post" as Method,
+    LOCAL: "local",
     EMAIL: "email",
     EMAIL_REGEX: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     USERNAME: "username",
@@ -25,12 +30,16 @@ export = Object.freeze({
     //oauth
 
     //kakao
+    KAKAO: "kakao",
     KAKAO_LOGIN_ERROR: 30,
     KAKAO_STATE_ERROR_CODE: 31,
     KAKAO_NO_ACCESS_CODE_STR: "no oauth access code",
     KAKAO_STATE_ERROR_STR: "invalid state",
-    KAKAO_CALLBACK_URI: "http://localhost:3000/oauth/kakao/callback",
+    KAKAO_LOGIN_URI: "http://localhost:3000/oauth/kakao/login",
+    KAKAO_LOGIN_CALLBACK_URI: "http://localhost:3000/oauth/kakao/loginCallback",
+    KAKAO_SIGNIN_CALLBACK_URI: "http://localhost:3000/oauth/kakao/signinCallback",
     KAKAO_GET_ACCESS_TOKEN_URI: "https://kauth.kakao.com/oauth/token",
+    KAKAO_GET_PROFILE_URI: "https://kapi.kakao.com/v2/user/me",
     KAKAO_GRANT_TYPE: "authorization_code",
 
     TEST_URI: "http://localhost:3000/test",

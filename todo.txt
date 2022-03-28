@@ -1,15 +1,13 @@
-typeORM? sequalize? 정하고 연동하기 - typeORM선정!
+typeORM? sequalize? 정하고 연동하기 - typeORM선정! v
 
-github 연동
-CRUD 다 해보고(insert, select 완성) 
-join 해보고
+github 연동 v
+CRUD 다 해보고(insert, select 완성) v
+join 해보고 v
 
-커스텀에러
+커스텀에러 v
 
-로깅
+로깅 x
 
-로그인 기능, OAUTH2 통한 로그인 구현
+로그인 기능, OAUTH2 통한 로그인 구현 v
 
 결제모듈 장착
-
-기능 추가

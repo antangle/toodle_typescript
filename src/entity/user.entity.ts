@@ -8,9 +8,9 @@ export class User {
     id?: number;
 
     @Column({
-        unique: true
+        nullable: true
     })
-    username!: string;
+    username?: string;
 
     @Column({
         unique: true
@@ -18,11 +18,14 @@ export class User {
     email?: string;
 
     @Column({
-        length: 73
+        length: 73,
+        nullable: true
     })
     password?: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     nickname?: string;
 
     @CreateDateColumn()
@@ -46,16 +49,15 @@ export class User {
     })
     terms_and_agreement?: number;
 
-    @Column({
-        nullable: true
+    @OneToMany(() => Auth, auth => auth.user, {
+        cascade: true
     })
-    login_method?: number;
-
-    @OneToMany(() => Auth, auth => auth.user)
     auth?: Auth[];
 
-    @Column()
-    role!: string;
+    @Column({
+        default: "user"
+    })
+    role?: string;
 
     @Column({
         nullable: true,

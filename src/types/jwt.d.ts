@@ -1,6 +1,6 @@
 declare module jsonwebtoken {
     export interface JwtPayload extends JwtPayload{
-        username: string;
+        email: string;
         role: string;
     }
 }
