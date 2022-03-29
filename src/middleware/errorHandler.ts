@@ -15,17 +15,12 @@ export const errCatcher = (fn: MiddlewareInput) => (req: Request, res: Response,
 }
 
 export const globalErrorHandler: ErrorRequestHandler = (err:Error, req:Request, res:Response, next:NextFunction) => {
+    console.log(req.pos!);
     if(err instanceof CustomError){
         console.log(errCode(req.pos!, err.statusCode));
     }
     else if (err instanceof JsonWebTokenError){
         console.log("something wrong with json token");
-    }
-    else if(err instanceof QueryFailedError){
-        //when user is already signed in
-        if(err.driverError.code == '23505'){
-            res.send("already logged in, please login with kakao account");
-        }
     }
 
     console.log(err);

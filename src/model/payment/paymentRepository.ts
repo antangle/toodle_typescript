@@ -3,5 +3,5 @@ import {EntityRepository, FindConditions, FindManyOptions, Repository, UpdateRes
 
 @EntityRepository(Payment)
 export class PaymentRepository extends Repository<Payment> {
-    
+
 }

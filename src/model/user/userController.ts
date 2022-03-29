@@ -35,7 +35,7 @@ export class UserController{
     //101
     private async getUser(req: Request, res: Response, next: NextFunction){
         const user: User[] | undefined = await this.service.getAllUser();
-        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        if(!user) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
 
         req.result = makeApiResponse(req.pos!, user);
         res.send(req.result);
@@ -52,8 +52,8 @@ export class UserController{
         newUser.password = hashedPassword;
 
         //insert
-        const user: boolean | undefined = await this.service.insertUser(newUser);
-        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        const user: User | undefined = await this.service.insertUser(newUser);
+        if(!user) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
         
         //send response
         req.result = makeApiResponse(req.pos!, user);
@@ -67,7 +67,7 @@ export class UserController{
         
         //update
         const user: User | undefined = await this.service.updateUser(newUser);
-        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        if(!user) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
         
         //send response
         req.result = makeApiResponse(req.pos!, user);
@@ -81,7 +81,7 @@ export class UserController{
         
         //delete user
         const user: User | undefined = await this.service.deleteUser(newUser);
-        if(!user) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        if(!user) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
         
         //send response
         req.result = makeApiResponse(req.pos!, user);

@@ -10,8 +10,10 @@ export class ProductService{
         //get new connection
         this.productRepository = getConnection(connectionName).getCustomRepository(ProductRepository);
     }
-    
-    async getProductInfo(productName: string): Promise<Product | undefined>{
-        return this.productRepository.getProduct(productName);
+    async save(product: Product): Promise<Product | undefined>{
+        return this.productRepository.save(product);
+    }
+    async getProductInfo(productId: number): Promise<Product | undefined>{
+        return this.productRepository.findOne({id: productId});
     }
 }

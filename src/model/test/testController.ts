@@ -15,12 +15,33 @@ export class TestController implements IController{
         this.router = Router();
         this.routes();
     }
-    public routes(){
-        this.router.use('/', setpos(900), verify, errCatcher(this.testHello));
+    private routes(){
+        this.router.use('/loginPage', setpos(901), errCatcher(this.loginPage));
+        this.router.use('/kakaoLoginPage', setpos(902), errCatcher(this.kakaoLoginPage));
+        this.router.use('/paymentPage', setpos(903), errCatcher(this.paymentPage));
+        this.router.use('/localLoginPage', setpos(903), errCatcher(this.localLoginPage));
+        this.router.use('/test', setpos(905), verify, errCatcher(this.testHello));
+        this.router.use('/', setpos(900), errCatcher(this.mainPage));
     }
-    public testHello(req:Request, res:Response, next:NextFunction){
+    private mainPage(req:Request, res:Response, next:NextFunction){
+        res.render('mainPage');
+    }
+    private loginPage(req:Request, res:Response, next:NextFunction){
+        res.render('login');
+    }
+    private localLoginPage(req:Request, res:Response, next:NextFunction){
+        res.render('localLogin');
+    }
+    private kakaoLoginPage(req:Request, res:Response, next:NextFunction){
+        res.render('kakaoLogin');
+    }
+    private paymentPage(req:Request, res:Response, next:NextFunction){
+        res.render('payment');
+    }
+    private testHello(req:Request, res:Response, next:NextFunction){
         //throw new CustomError(1, "you did it!");
         console.log(req.pos);
+        console.log(req.userId);
         res.send("hello World!");
     }
 }

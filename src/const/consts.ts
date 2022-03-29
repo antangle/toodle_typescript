@@ -27,12 +27,15 @@ export = Object.freeze({
     ACCESS_TOKEN_EXP_TIME: "1h",
     ACCESSTOKEN: "accessToken",
     REFRESHTOKEN: "refreshToken",
-    //oauth
+    //iamport
+    IAMPORT_GETTOKEN_URI: "https://api.iamport.kr/users/getToken",
+    IAMPORT_PAYMENTS_URI: "https://api.iamport.kr/payments/",
 
+
+    //oauth
+    
     //kakao
     KAKAO: "kakao",
-    KAKAO_LOGIN_ERROR: 30,
-    KAKAO_STATE_ERROR_CODE: 31,
     KAKAO_NO_ACCESS_CODE_STR: "no oauth access code",
     KAKAO_STATE_ERROR_STR: "invalid state",
     KAKAO_LOGIN_URI: "http://localhost:3000/oauth/kakao/login",
@@ -41,11 +44,11 @@ export = Object.freeze({
     KAKAO_GET_ACCESS_TOKEN_URI: "https://kauth.kakao.com/oauth/token",
     KAKAO_GET_PROFILE_URI: "https://kapi.kakao.com/v2/user/me",
     KAKAO_GRANT_TYPE: "authorization_code",
-
+    
     TEST_URI: "http://localhost:3000/test",
-
+    
     //Message
-    NO_USER_EXISTS_STR: "user does not exist",
+    USER_NOT_EXISTS_STR: "user does not exist",
     NO_TOKEN_STR: "no token",
     WRONG_INPUT_STR: "wrong user input",
     REFRESH_TOKEN_REQUEST_STR: "give me refresh token!",
@@ -53,14 +56,22 @@ export = Object.freeze({
     UNDEFINED_STR: "this const is undefined",
     INSERT_ERROR_STR: "insert not working",
     REGEX_UNMATCH_STR: "regex doesn't match",
-
+    PRODUCT_NOT_EXIST_STR: "product does not exist",
+    PAYMENT_NOT_MATCH_STR: "payment info does not match",
     //code
-    NO_USER_EXISTS_CODE: 1,
+    USER_NOT_EXISTS_CODE: 1,
     NO_TOKEN_CODE: 2,
     WRONG_INPUT_CODE: 3,
     INVALID_TOKEN_CODE: 4,
     UNDEFINED_CODE: 5,
-    INSERT_ERROR_CODE: 6,
     REGEX_UNMATCH_CODE: 7,
+    
+    KAKAO_LOGIN_ERROR_CODE: 30,
+    KAKAO_STATE_ERROR_CODE: 31,
+    
     REFRESH_TOKEN_REQUEST: 77,
+    INSERT_ERROR_CODE: -1,
+    PRODUCT_NOT_EXIST_CODE: -2,
+    PAYMENT_NOT_MATCH_CODE: -3,
+
 });

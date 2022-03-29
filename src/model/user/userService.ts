@@ -16,7 +16,7 @@ export class UserService{
         //get new connection
         this.userRepository = getConnection(connectionName).getCustomRepository(UserRepository);
     }
-    async save(user: User):Promise<any>{
+    async save(user: User):Promise<User | undefined>{
         return this.userRepository.save(user);
     } 
     //find all users
@@ -29,15 +29,14 @@ export class UserService{
         const result: User | undefined = await this.userRepository.findOne({email: user.email});
         return !!result;
     }
-    async getRefreshToken(payload: JwtPayload): Promise<string | undefined> {
-        const email = payload.email;
-        const result: User | undefined = await this.userRepository.findOne({email: email});
-        return result!.refreshToken;
+    async getRefreshToken(payload: JwtPayload): Promise<User | undefined> {
+        const userId = payload.userId;
+        const result: User | undefined = await this.userRepository.findOne({id: userId});
+        return result;
     }
-    async getPasswordByEmail(user: UserDTO): Promise<string | undefined>{
+    async getPasswordByEmail(user: UserDTO): Promise<User | undefined>{
         const result: User | undefined = await this.userRepository.findOne({email: user.email});
-        if(!result) throw new CustomError(consts.NO_USER_EXISTS_CODE, consts.NO_USER_EXISTS_STR);
-        return result.password;
+        return result;
     }
 
     async saveRefreshToken(email: string, token: string): Promise<boolean>{
@@ -46,9 +45,9 @@ export class UserService{
     }
     
     //insert new user
-    async insertUser(user: UserDTO): Promise<boolean | undefined>{
+    async insertUser(user: UserDTO): Promise<User | undefined>{
         const result: User | undefined = await this.userRepository.save(user.toUserEntity());     
-        return !!result;
+        return result;
     }
     
     //update nickname by username

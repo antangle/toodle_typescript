@@ -13,7 +13,7 @@ import { Auth } from '../../entity/auth.entity';
 import { User } from '../../entity/user.entity';
 import { sign } from '../../middleware/jwt';
 import { makeApiResponse } from '../../util/responseHandler';
-import { QueryFailedError } from 'typeorm';
+import { EntityNotFoundError, QueryFailedError } from 'typeorm';
 
 export class KakaoController implements IController{
     public url: string;
@@ -34,6 +34,7 @@ export class KakaoController implements IController{
         this.router.get('/loginCallback', setpos(221), errCatcher(this.loginCallback.bind(this)));
         this.router.get('/signin', setpos(222), errCatcher(this.signin.bind(this)));
         this.router.get('/signinCallback', setpos(223), errCatcher(this.signinCallback.bind(this)));
+        this.router.get('/logout', setpos(224), errCatcher(this.logout.bind(this)));
     }
 
     
@@ -49,9 +50,9 @@ export class KakaoController implements IController{
         res.render('kakaoLogin', renderPayload);
     }
     
-    async signinCallback(req:Request, res:Response, next:NextFunction){
+    private async signinCallback(req:Request, res:Response, next:NextFunction){
         //get authorization code, check errors
-        if(req.query.error) throw new CustomError(errCode(req.pos!, consts.KAKAO_LOGIN_ERROR), req.query.error as string);
+        if(req.query.error) throw new CustomError(errCode(req.pos!, consts.KAKAO_LOGIN_ERROR_CODE), req.query.error as string);
         if(req.query.state != process.env.KAKAO_STATE) throw new CustomError(errCode(req.pos!, consts.KAKAO_STATE_ERROR_CODE), consts.KAKAO_STATE_ERROR_STR);
 
         //get access token
@@ -85,17 +86,28 @@ export class KakaoController implements IController{
         user.auth = [auth];
         
         //save to db
-        const result = await this.userService.save(user.toUserEntity());
+        const userdb = await this.userService.save(user.toUserEntity())
+            .catch((err) => {
+                if(err instanceof QueryFailedError){
+                    //when user is already signed in
+                    if(err.driverError.code == '23505'){
+                        res.send("already signed in!!");
+                    }
+                }
+            });
+        if(!userdb) throw new CustomError(errCode(req.pos!, consts.INSERT_ERROR_CODE), consts.INSERT_ERROR_STR);
+
         //when user is already signed in, errhandler catches and sends response.
         //not really sure throwing to errhandler magically is a good idea here..
 
         //sign new jwts
-        const token = sign(user);
+        user.id = userdb.id;
+        const {accessToken, refreshToken} = sign(user);
         
         //send out jwt cookie
         req.result = makeApiResponse(req.pos!);
-        res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
-        res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
+        res.cookie('accessToken', accessToken, {path: '/', httpOnly: true});
+        res.cookie('refreshToken', refreshToken, {path: '/', httpOnly: true});
         
         res.send(req.result);
     }
@@ -112,9 +124,9 @@ export class KakaoController implements IController{
     }
 
     //when kakao login is completed, get callback with authorization code
-    async loginCallback(req:Request, res:Response, next:NextFunction){
+    private async loginCallback(req:Request, res:Response, next:NextFunction){
 
-        if(req.query.error) throw new CustomError(errCode(req.pos!, consts.KAKAO_LOGIN_ERROR), req.query.error as string);
+        if(req.query.error) throw new CustomError(errCode(req.pos!, consts.KAKAO_LOGIN_ERROR_CODE), req.query.error as string);
         if(req.query.state != process.env.KAKAO_STATE) throw new CustomError(errCode(req.pos!, consts.KAKAO_STATE_ERROR_CODE), consts.KAKAO_STATE_ERROR_STR);
 
         //get access token, method, uri, header, body
@@ -151,18 +163,25 @@ export class KakaoController implements IController{
         
         console.log(auth.refresh_token);
         //save refreshToken in db, also checking if user has signed in already
-        const isLoggedIn: boolean = await this.authService.saveKakaoRefreshToken(userDTO);
+        const userdb: User | undefined | void= await this.authService.saveKakaoRefreshToken(userDTO)
+            .catch((err) => {
+                if(err instanceof EntityNotFoundError){
+                    res.send(makeApiResponse(req.pos!, "need to sign in first!"));
+                }
+            });
+        if(!userdb) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
+        userDTO.id = userdb.id;
+        const token = sign(userDTO);
+        //send out local jwts
+        req.result = makeApiResponse(req.pos!);
+        res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
+        res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
+        res.send(req.result);
         
-        if(isLoggedIn){
-            const token = sign(userDTO);
-            //send out local jwts
-            req.result = makeApiResponse(req.pos!);
-            res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
-            res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
-            res.send(req.result);
-        }
-        else{
-            res.send(makeApiResponse(req.pos!, "need to sign in first!"));
-        }
+    }
+
+    //logout is mainly about cutting cookies on frontend.
+    private async logout(req:Request, res:Response, next:NextFunction){
+        //to be implemented
     }
 }

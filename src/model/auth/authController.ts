@@ -50,15 +50,15 @@ export class AuthController implements IController{
         if(!user) throw new InputError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
 
         //get hashed password from db
-        const password: string | undefined = await this.service.getPasswordByEmail(user);
-        if(!password) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
-        const hashPassword = password;
+        const userdb: User | undefined = await this.service.getPasswordByEmail(user);
+        if(!userdb) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
 
         //compare password with bcrypt
-        const isPasswordMatch = await comparePassword(user.password!, hashPassword!);
-        if(!isPasswordMatch) throw new CustomError(errCode(req.pos!, consts.NO_USER_EXISTS_CODE), consts.NO_USER_EXISTS_STR);
+        const isPasswordMatch = await comparePassword(user.password!, userdb.password!);
+        if(!isPasswordMatch) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
 
         //sign jwt and send
+        user.id = userdb.id;
         const token = sign(user);
 
         req.result = makeApiResponse(req.pos!);
@@ -77,15 +77,18 @@ export class AuthController implements IController{
         user.password = await hashPassword(user.password!);        
         
         //sign jwt and send
-        const token = sign(user);
+        const refreshToken = sign(user).refreshToken;
 
-        user.refreshToken = token.refreshToken;
-        const result = await this.service.insertUser(user);
-        if(!result) throw new CustomError(errCode(req.pos!, consts.INSERT_ERROR_CODE), consts.INSERT_ERROR_STR);
-
+        user.refreshToken = refreshToken;
+        const userdb = await this.service.insertUser(user);
+        if(!userdb) throw new CustomError(errCode(req.pos!, consts.INSERT_ERROR_CODE), consts.INSERT_ERROR_STR);
+        //need userId for accesstoken, so sign again...
+        user.id = userdb.id;
+        const accessToken = sign(user);
+ 
         req.result = makeApiResponse(req.pos!);
-        res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});
-        res.cookie('refreshToken', token.refreshToken, {path: '/', httpOnly: true});
+        res.cookie('accessToken', accessToken, {path: '/', httpOnly: true});
+        res.cookie('refreshToken', refreshToken, {path: '/', httpOnly: true});
         res.send(req.result);
     }
 }

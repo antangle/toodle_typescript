@@ -1,3 +1,4 @@
+import { ProductController } from './model/product/productController';
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -15,6 +16,9 @@ import { UserController } from './model/user/userController';
 import { KakaoController } from './model/auth/kakaoController';
 import consts from './const/consts';
 import { AuthService } from './model/auth/authService';
+import { PaymentService } from './model/payment/paymentService';
+import { PaymentController } from './model/payment/paymentController';
+import { ProductService } from './model/product/productService';
 
 async function main(){
     await createConnection(config);
@@ -29,16 +33,26 @@ async function main(){
     //instance container
     const userService = new UserService(consts.TYPEORM_CONNECTION_NAME);
     const authService = new AuthService(consts.TYPEORM_CONNECTION_NAME);
+    const paymentService = new PaymentService(consts.TYPEORM_CONNECTION_NAME);
+    const productService = new ProductService(consts.TYPEORM_CONNECTION_NAME);
     const userController = new UserController('/user', userService);
     const authController = new AuthController('/auth', userService);
-    const testController = new TestController('/test');
     const kakaoController = new KakaoController('/oauth/kakao', userService, authService);
+    const paymentController = new PaymentController('/payment', paymentService, productService);
+    const productController = new ProductController('/product', productService);
+    const testController = new TestController('/');
+
+
 
     const controllers: IController[] = [
         userController,
         authController,
-        testController,
         kakaoController,
+        paymentController,
+        productController,
+
+        //test should be last
+        testController,
     ];
 
     const server = new Server(middlewares, controllers, globalErrorHandler);

@@ -13,6 +13,7 @@ export interface IController {
 }
 
 export interface JwtResult {
+    [x: string]: any;
     isvalid: boolean;
     payload?: JwtPayload;
     refresh?: boolean;

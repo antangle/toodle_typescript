@@ -3,6 +3,7 @@ import { Auth } from './../entity/auth.entity';
 export class UserDTO {
     
     [key: string]: any;
+    id ?: number;
     username !: string;
     nickname ?: string;
     password ?: string;

@@ -1,3 +1,4 @@
+import { User } from './../../entity/user.entity';
 import { UserDTO } from './../../dto/userDto';
 import { getConnection } from 'typeorm';
 import { AuthRepository } from './authRepository';
@@ -12,13 +13,10 @@ export class AuthService{
         this.authRepository = getConnection(connectionName).getCustomRepository(AuthRepository);
         this.userRepository = getConnection(connectionName).getCustomRepository(UserRepository);
     }
-    async saveKakaoRefreshToken(user: UserDTO): Promise<boolean>{
+    async saveKakaoRefreshToken(user: UserDTO): Promise<User | undefined>{
         const auth = user.auth![0];
-        const {id} = await this.userRepository.findOneOrFail({email: user.email});
-        console.log(id);
-        console.log(auth);
-        const result = await this.authRepository.update({userId: id}, {refresh_token: auth.refresh_token});
-        console.log(result);
-        return !!result;
+        const userdb = await this.userRepository.findOneOrFail({email: user.email});
+        const result = await this.authRepository.update({userId: userdb.id}, {refresh_token: auth.refresh_token});
+        return userdb;
     }
 }

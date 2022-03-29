@@ -10,8 +10,22 @@ export class Payment{
     id?: number;
 
     @ManyToOne(() => User)
-    user?: User
+    user?: User;
 
-    @ManyToOne(() => Product)
-    product?: Product
+    @Column()
+    userId?: number;
+
+    @ManyToOne(() => Product, {
+        eager: true,
+    })
+    product?: Product;
+
+    @Column()
+    productId ?: number;
+
+    @Column()
+    merchant_uid ?: string;
+
+    @Column()
+    cost?: number;
 }

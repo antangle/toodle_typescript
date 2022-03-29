@@ -14,8 +14,8 @@ const secret: string | undefined = process.env.JWT_SECRET;
 export const sign = (user: UserDTO) => {
     
     const payload = {
-        email: user.email,
-        role: user.role
+        role: user.role,
+        userId: user.id
     };
     
     //set access, refresh Token
@@ -43,16 +43,17 @@ const verifyUnwrap = async (req: Request, res: Response, next: NextFunction) => 
     if(!req.cookies.accessToken){
         const token = req.cookies.refreshToken;
         const decoded: JwtResult = verifyToken(token);
-        console.log(decoded);
         if(decoded.isvalid){
             //check with database
-            const yourRefreshToken = await userService.getRefreshToken(decoded.payload!);
+            const user = await userService.getRefreshToken(decoded.payload!);
+            if(!user) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
 
             //if refreshToken does not match, then throw
-            if(yourRefreshToken != token) throw new CustomError(errCode(req.pos!, consts.INVALID_TOKEN_CODE), consts.INVALID_TOKEN_STR);
-            const newToken: string = jwt.sign({email: decoded.payload}, secret!, {
+            if(user.refreshToken != token) throw new CustomError(errCode(req.pos!, consts.INVALID_TOKEN_CODE), consts.INVALID_TOKEN_STR);
+            const newToken: string = jwt.sign({userId: decoded.payload!.userId}, secret!, {
                 expiresIn: consts.REFRESH_TOKEN_EXP_TIME
             });
+            req.userId = user.id;
             //do i have to resign refresh token..?
             res.cookie(consts.REFRESHTOKEN, newToken, {path: '/', httpOnly: true});
             next();
@@ -70,6 +71,7 @@ const verifyUnwrap = async (req: Request, res: Response, next: NextFunction) => 
             const newToken: string = jwt.sign(decoded.payload!, secret!, {
                 expiresIn: consts.ACCESS_TOKEN_EXP_TIME
             });
+            req.userId = decoded.payload!.userId;
             res.cookie(consts.ACCESSTOKEN, newToken, {path: '/', httpOnly: true});
             next();
         }
@@ -89,12 +91,12 @@ const verifyToken = (token: string): JwtResult => {
     //we have to check refresh token if token is expired. so use try / catch on this one!
     let result: JwtResult;
     try{
-        const {email, role} = jwt.verify(token, secret!) as jwt.JwtPayload;
+        const {userId, role} = jwt.verify(token, secret!) as jwt.JwtPayload;
         result = {
             isvalid: true,
             refresh: false,
             payload: {
-                email: email,
+                userId: userId,
                 role: role
             }
         }

@@ -1,19 +1,16 @@
 import { PaymentRepository } from './paymentRepository';
 import { Payment } from './../../entity/payment.entity';
-import { ProductRepository } from '../product/productRepository';
-import express, { Request, Response, NextFunction} from 'express';
-import { Connection, getConnection, getCustomRepository, Repository } from "typeorm";
-import { Product } from '../../entity/product.entity';
+import { getConnection } from "typeorm";
 
 export class PaymentService{
     //repository
     paymentRepository: PaymentRepository  
     constructor(connectionName:string){
         //get new connection
-        this.paymentRepository = getConnection(connectionName).getCustomRepository(ProductRepository);
+        this.paymentRepository = getConnection(connectionName).getCustomRepository(PaymentRepository);
     }
     
-    async savePayment(payment:Payment): Promise<Payment | undefined>{
+    async savePayment(payment: Payment): Promise<Payment | undefined>{
         return this.paymentRepository.save(payment);
     }
 }
