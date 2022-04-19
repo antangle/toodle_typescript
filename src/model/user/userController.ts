@@ -3,7 +3,7 @@ import { InputError } from './../../error/inputError';
 import { hashPassword } from '../../util/passwordEncrypter';
 import { errCatcher, errCode } from './../../middleware/errorHandler';
 import { validateInput } from '../../middleware/validator';
-import { UserDTO } from './../../dto/userDTO';
+import { UserDto } from './../../dto/userDto';
 import { Request, Response, NextFunction, Router } from 'express';
 import { UserService } from './userService';
 import { User } from '../../entity/user.entity';
@@ -43,7 +43,7 @@ export class UserController{
     //102    
     private async insertUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
-        const newUser: UserDTO = req.newUser;
+        const newUser: UserDto = req.newUser;
         if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //hash password with bcrypt
@@ -62,7 +62,7 @@ export class UserController{
     //103
     private async updateUserNickname(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
-        const newUser: UserDTO = req.newUser;
+        const newUser: UserDto = req.newUser;
         if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //update
@@ -76,7 +76,7 @@ export class UserController{
     //104    
     private async deleteUser(req: Request, res: Response, next: NextFunction){
         //parsing middleware put newUser in req object
-        const newUser: UserDTO = req.newUser;
+        const newUser: UserDto = req.newUser;
         if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //delete user

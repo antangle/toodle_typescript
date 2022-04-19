@@ -1,5 +1,5 @@
 import { AuthService } from './authService';
-import { UserDTO } from './../../dto/userDto';
+import { UserDto } from './../../dto/userDto';
 import { Response, NextFunction } from 'express';
 import { setpos } from '../../middleware/setPosition';
 import { UserService } from '../user/userService';
@@ -80,7 +80,7 @@ export class KakaoController implements IController{
         auth.register_id = kakaoProfile.data.id;
         auth.provider = consts.KAKAO;
         auth.refresh_token = kakaoRefreshToken;
-        const user = new UserDTO();
+        const user = new UserDto();
         user.email = kakaoProfile.data.kakao_account.email;
         user.nickname = kakaoProfile.data.kakao_account.profile.nickname;
         user.auth = [auth];
@@ -154,24 +154,24 @@ export class KakaoController implements IController{
         auth.register_id = kakaoProfile.data.id;
         auth.refresh_token = kakaoRefreshToken;
 
-        const userDTO = new UserDTO();
-        userDTO.email = kakaoProfile.data.kakao_account.email;
-        userDTO.nickname = kakaoProfile.data.kakao_account.profile.nickname;
-        userDTO.auth = [auth];
+        const userDto = new UserDto();
+        userDto.email = kakaoProfile.data.kakao_account.email;
+        userDto.nickname = kakaoProfile.data.kakao_account.profile.nickname;
+        userDto.auth = [auth];
         //for jwt sign
-        userDTO.role = "user";
+        userDto.role = "user";
         
         console.log(auth.refresh_token);
         //save refreshToken in db, also checking if user has signed in already
-        const userdb: User | undefined | void= await this.authService.saveKakaoRefreshToken(userDTO)
+        const userdb: User | undefined | void= await this.authService.saveKakaoRefreshToken(userDto)
             .catch((err) => {
                 if(err instanceof EntityNotFoundError){
                     res.send(makeApiResponse(req.pos!, "need to sign in first!"));
                 }
             });
         if(!userdb) throw new CustomError(errCode(req.pos!, consts.USER_NOT_EXISTS_CODE), consts.USER_NOT_EXISTS_STR);
-        userDTO.id = userdb.id;
-        const token = sign(userDTO);
+        userDto.id = userdb.id;
+        const token = sign(userDto);
         //send out local jwts
         req.result = makeApiResponse(req.pos!);
         res.cookie('accessToken', token.accessToken, {path: '/', httpOnly: true});

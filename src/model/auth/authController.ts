@@ -6,7 +6,7 @@ import { sign } from './../../middleware/jwt';
 import { InputError } from './../../error/inputError';
 import { makeApiResponse } from '../../util/responseHandler';
 import { validateInput } from '../../middleware/validator';
-import { UserDTO } from './../../dto/userDto';
+import { UserDto } from './../../dto/userDto';
 import { UserService } from './../user/userService';
 import { errCatcher, errCode } from './../../middleware/errorHandler';
 import { Router } from 'express';
@@ -35,7 +35,7 @@ export class AuthController implements IController{
     
     //201
     private async checkEmailExists(req: Request, res: Response, next: NextFunction){
-        const newUser: UserDTO = req.newUser;
+        const newUser: UserDto = req.newUser;
         if(!newUser) throw new CustomError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         const isEmailExists: boolean = await this.service.getEmail(newUser);
@@ -46,7 +46,7 @@ export class AuthController implements IController{
     //202
     //local login. only with username, password, when succeed => sign new access token
     private async login(req:Request, res:Response, next:NextFunction){
-        const user: UserDTO = req.newUser;
+        const user: UserDto = req.newUser;
         if(!user) throw new InputError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
 
         //get hashed password from db
@@ -70,7 +70,7 @@ export class AuthController implements IController{
     //203
     //signing in logic. when successful, insert db then sign tokens
     private async signIn(req:Request, res:Response, next:NextFunction){
-        const user: UserDTO = req.newUser;
+        const user: UserDto = req.newUser;
         if(!user) throw new InputError(errCode(req.pos!, consts.WRONG_INPUT_CODE), consts.WRONG_INPUT_STR);
         
         //hash password with bcrypt

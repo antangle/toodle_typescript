@@ -1,8 +1,10 @@
 # first project with typeorm
 
-제가 처음 만든 서버의 코드들을 한번 뜯어보니 정말 다양하게 문제들을 볼 수 있었습니다. 이번 프로젝트는 그 문제들을 몇개 해결하고자 짜보는 개인 프로젝트입니다.
+제가 처음 만든 서버의 코드들을 뜯어보니 정말 다양한 문제들을 볼 수 있었습니다. 이번 프로젝트는 그 문제들을 해결하고자 실험해보는 개인 프로젝트입니다.
+
 
 # 개선점
+
 
 # 1. 무분별한 try / catch 구문 해결
 모든 api가 try, catch를 사용하며 간단한 코드도 가독성이 좋지 않았다. 따라서 이번에는 try catch를 최소한으로 써서 구조를 짜보기로 하였다.
@@ -16,6 +18,7 @@ export const errCatcher = (fn: MiddlewareInput) => (req: Request, res: Response,
 이 코드는 미들웨어 함수를 Promise로 감싸고, 그것을 resolve할 시 에러가 나온다면 catch문에서 받고 globalErrorHandler에게 넘겨주는 역할을 한다.
 미들웨어 함수들은 import 하기 전 errCatcher로 감싸주면 try catch문 필요없이 모든 에러들을 원하는대로 handling하는것이 가능하다.
 
+
 # 2. CustomError 와 에러코드 체계 확립
 이전의 api는 각각 try / catch 문의 catch단계에서 직접 -2022번 에러를 명시하는 식으로 구성했었다.
 이것은 api문서를 작성할때도 모든 에러를 손수 정의해야 했기 때문에 일관성도 부족하고 직관성도 떨어졌다.
@@ -26,12 +29,15 @@ export const errCatcher = (fn: MiddlewareInput) => (req: Request, res: Response,
 이러함으로써 얻는 이득은 어디에서 에러가 나더라도 errorHandler가 그 pos를 알 수 있다.
 즉, 어떤 api를 콜했는지, 어떤 종류의 에러인지 한눈에 보인다.
 
+
 # 3. consts
 일부 변수들과 string들을 하드코딩한 전과 달리, 더 가독성도 높고 수정도 편한 consts를 선언하여 상수들을 관리했다.
+
 
 # 4. orm의 사용
 모든 쿼리를 직접 raw sql로 짯던 전과 달리 orm이라는 신기술을 써보기로 하였다.
 sequalize와 typeorm의 선택지 중, typescript와 좀더 호환성이 높고, typescript가 징징대며 귀찮게할 변수들이 sequalize가 더 많다는 말을 보고 typeorm을 선정했다.
+
 
 # 5. OOP와 DI의 활용
 Controller, Service, Repository의 구조를 따라 코드를 짰으며, class를 만들고 각 controller들에 service를 의존성 주입하여 각각의 종속성을 낮추었다.
@@ -51,4 +57,4 @@ DI를 spring마냥 Bean으로 등록하는 것이 얼마나 편한건지 깨달�
 4. 에러 헨들러
 5. 데이터베이스 CRUD 및 relation
 
-todo: 인덱싱, DI관련 좀더 공부? 소켓 프로그래밍, 로깅
+todo: 인덱싱, DI관련 좀더 공부? 소켓 프로그래밍, 로깅, 도커

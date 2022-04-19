@@ -1,6 +1,6 @@
 import { User } from '../entity/user.entity';
-import { Auth } from './../entity/auth.entity';
-export class UserDTO {
+import { Auth } from '../entity/auth.entity';
+export class UserDto {
     
     [key: string]: any;
     id ?: number;

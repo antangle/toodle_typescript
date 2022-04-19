@@ -1,11 +1,11 @@
 import { errCatcher, errCode } from './errorHandler';
 import { InputError } from '../error/inputError';
-import { UserDTO } from '../dto/userDTO';
+import { UserDto } from '../dto/userDto';
 import consts from '../const/consts';
 import { NextFunction, Request, Response } from "express";
 
 const validateInputUnwrap = (req: Request, res: Response, next: NextFunction) => {
-    const dto = new UserDTO();
+    const dto = new UserDto();
     const inputs = req.body.user;
 
     //validate email, nickname, password by regex

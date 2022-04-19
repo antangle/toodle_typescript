@@ -4,14 +4,14 @@ import { UserService } from './../model/user/userService';
 import { JwtResult } from './../interface/interfaces';
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from '../error/customError';
-import { UserDTO } from '../dto/userDto';
+import { UserDto } from '../dto/userDto';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { makeApiResponse } from '../util/responseHandler';
 
 const secret: string | undefined = process.env.JWT_SECRET;
 
 //sign new jwt
-export const sign = (user: UserDTO) => {
+export const sign = (user: UserDto) => {
     
     const payload = {
         role: user.role,

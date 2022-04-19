@@ -1,4 +1,4 @@
-import { UserDTO } from './../../dto/userDTO';
+import { UserDto } from './../../dto/userDto';
 import {DeleteResult, EntityRepository, FindConditions, FindManyOptions, Repository, UpdateResult} from "typeorm";
 import {User} from "../../entity/user.entity";
 
@@ -29,7 +29,7 @@ export class UserRepository extends Repository<User> {
             .getOne();
         return result;
     }
-    async saveUser(user: UserDTO): Promise<any>{
+    async saveUser(user: UserDto): Promise<any>{
         const result = await this.createQueryBuilder()
             .insert()
             .into(User)

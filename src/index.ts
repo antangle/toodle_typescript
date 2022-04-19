@@ -21,6 +21,8 @@ import { PaymentController } from './model/payment/paymentController';
 import { ProductService } from './model/product/productService';
 
 async function main(){
+    console.log(process.env);
+
     await createConnection(config);
 
     const middlewares: any[] = [
